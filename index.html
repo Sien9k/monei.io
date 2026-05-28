@@ -836,9 +836,12 @@
             formTransaksi.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 try {
-                    const amountRaw = document.getElementById('amount').value.replace(/\./g, '').replace(',', '.');
-                    const amount = safeFloat(amountRaw); const tanggal = document.getElementById('tanggal').value;
-                    const kategori = document.getElementById('kategori').value; const catatan = document.getElementById('catatan').value;
+                    // UBAH 'amount' MENJADI 'nominal' DI SINI
+                    const amountRaw = document.getElementById('nominal').value.replace(/\./g, '').replace(',', '.');
+                    const amount = safeFloat(amountRaw); 
+                    const tanggal = document.getElementById('tanggal').value;
+                    const kategori = document.getElementById('kategori').value; 
+                    const catatan = document.getElementById('catatan').value;
 
                     if (!amount || amount <= 0) return alert("Ups! Nominal tidak boleh kosong atau nol.");
                     if (!kategori) return alert("Ups! Tolong pilih kategori pengeluaran dulu.");
@@ -846,7 +849,10 @@
                     const { error } = await supabaseClient.from('transactions').insert([{ amount: amount, transaction_date: tanggal, category_id: kategori, notes: catatan }]);
                     if (error) throw error;
                     
-                    document.getElementById('amount').value = ''; document.getElementById('catatan').value = '';
+                    // UBAH 'amount' MENJADI 'nominal' DI SINI JUGA
+                    document.getElementById('nominal').value = ''; 
+                    document.getElementById('catatan').value = '';
+                    
                     alert("🎉 Transaksi berhasil disimpan!");
                     await updateDashboardBalance(); await setPresetPeriodeTanggal('hari-ini'); await hitungSisaBudget();
                 } catch (err) { alert("GAGAL MENYIMPAN TRANSAKSI:\n" + err.message); }
@@ -901,19 +907,22 @@
         }
 
         async function inisialisasiAplikasi() {
-            const pdfEndEl = document.getElementById('pdfEndDate');
-            const pdfStartEl = document.getElementById('pdfStartDate');
-            
-            if(pdfEndEl) pdfEndEl.value = getTanggalHariIni();
-            const d = new Date(); d.setDate(1); 
-            if(pdfStartEl) pdfStartEl.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const pdfEndEl = document.getElementById('pdfEndDate');
+        const pdfStartEl = document.getElementById('pdfStartDate');
+        
+        if(pdfEndEl) pdfEndEl.value = getTanggalHariIni();
+        const d = new Date(); d.setDate(1); 
+        if(pdfStartEl) pdfStartEl.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-            await muatKategori(); await updateDashboardBalance(); setHariIni(); await setPresetPeriodeTanggal('hari-ini');
-            const amountEl = document.getElementById('amount');
-            if (amountEl) { amountEl.type = 'text'; amountEl.inputMode = 'numeric'; amountEl.addEventListener('input', () => formatInputAmount(amountEl)); }   
-            const budgetAmountEl = document.getElementById('budgetAmount');
-            if (budgetAmountEl) { budgetAmountEl.type = 'text'; budgetAmountEl.inputMode = 'numeric'; budgetAmountEl.addEventListener('input', () => formatInputAmount(budgetAmountEl)); }
-        }
+        await muatKategori(); await updateDashboardBalance(); setHariIni(); await setPresetPeriodeTanggal('hari-ini');
+        
+        // UBAH 'amount' MENJADI 'nominal' DI SINI
+        const amountEl = document.getElementById('nominal');
+        if (amountEl) { amountEl.type = 'text'; amountEl.inputMode = 'numeric'; amountEl.addEventListener('input', () => formatInputAmount(amountEl)); }   
+        
+        const budgetAmountEl = document.getElementById('budgetAmount');
+        if (budgetAmountEl) { budgetAmountEl.type = 'text'; budgetAmountEl.inputMode = 'numeric'; budgetAmountEl.addEventListener('input', () => formatInputAmount(budgetAmountEl)); }
+        }   
 
         async function resetAnggaranTarget() {
             try {
