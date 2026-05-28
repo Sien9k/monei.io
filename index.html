@@ -130,6 +130,103 @@
         .btn-hapus-inner span { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; font-weight: 700; flex: 1; text-align: left; margin-left: 10px; color: #FFFFFF; }
         #tampilanBudget { font-family: 'Comfortaa', sans-serif; }
         #tampilanBudget span:nth-child(even) { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+
+        /* Tombol Kalkulator di Header */
+        .btn-header-calc {
+            background-color: var(--blue, #87CEEB); /* Warna biru muda senada dengan card */
+            color: var(--dark, #000);
+            border: 2px solid var(--dark, #000);
+            border-radius: 8px; /* Dibuat agak kotak menyesuaikan tombol profil */
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            box-shadow: 2px 2px 0px var(--dark, #000);
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .btn-header-calc:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--dark, #000);
+        }
+
+        .calc-modal {
+            display: none; /* Sembunyikan secara bawaan */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calc-card {
+            background: white;
+            border: 3px solid var(--dark, #000);
+            border-radius: 15px;
+            padding: 15px;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 6px 6px 0px var(--dark, #000);
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calc-close {
+            background: #FF3333;
+            border: 2px solid #000;
+            color: white;
+            border-radius: 5px;
+            width: 30px; height: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .calc-display {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1.5rem;
+            padding: 10px;
+            text-align: right;
+            margin-bottom: 15px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            background: #f4f4f4;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-grid button {
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #000;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 2px 2px 0px #000;
+            cursor: pointer;
+        }
+        .calc-grid button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #000;
+        }
+        .calc-grid button.op { background: #F0A72B; } /* Warna Kuning untuk operator */
+        .calc-grid button.clear { background: #FFAEC1 ; color: white; } /* Merah untuk hapus */
+        .calc-grid button.equal { background: #82D1E0; color: white; } /* Hijau untuk hasil */
     </style>
 </head>
 <body>
@@ -154,11 +251,15 @@
                 <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -1px; margin: 0;">
                     my<span style="color: var(--blue); -webkit-text-stroke: 1px var(--dark); text-shadow: 2px 2px 0px var(--dark);">MONEY</span>
                 </h2>
+                <button onclick="toggleCalculator()" class="btn-header-calc">
+                    <i class="fa-solid fa-calculator"></i>
+                </button>
                 <div style="font-size: 0.70rem; font-weight: 800; background: var(--yellow); border: 2px solid var(--dark); border-radius: 8px; padding: 6px 12px; box-shadow: 2px 2px 0px var(--dark);">
                     <div onclick="logoutUser()" style="cursor: pointer; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 5px; color: var(--dark);">
                         Hi, <span id="user-display">User</span>! <i class="fa-solid fa-right-from-bracket"></i>
                     </div>
                 </div>
+               
             </div>
 
             <div class="center-wrap" style="margin: 0;">
@@ -184,7 +285,7 @@
                 <div class="card" style="margin-bottom: 0;">
                     <h2 class="card-title">Catat Pengeluaran</h2>
                     <form id="formTransaksi">
-                        <div class="form-group"><input type="text" id="amount" placeholder="Nominal (Rp)" required></div>
+                        <div class="form-group"><input type="text" id="nominal" placeholder="Nominal (Rp)" oninput="formatRupiah(this)" required></div>
                         <div class="form-group" style="display: flex; gap: 10px;">
                             <input type="date" id="tanggal" required style="flex: 1;">
                             <button type="button" id="btnHariIni" style="background: var(--red); border: var(--border-width) solid var(--dark); border-radius: 10px; font-weight: 700; padding: 0 15px; box-shadow: 2px 2px 0px var(--dark);" onclick="setHariIni()">Hari Ini</button>
@@ -896,6 +997,138 @@
         }
         
         cekSesiSistem();
+        // --- FUNGSI AUTO FORMAT RIBUAN KETIKA DIKETIK MANUAL ---
+function formatRupiah(input) {
+    // 1. Hapus semua huruf atau simbol selain angka (termasuk titik lama)
+    let angkaPolos = input.value.replace(/[^0-9]/g, '');
+    
+    // 2. Jika kotaknya tidak kosong, format ulang pakai titik
+    if (angkaPolos !== '') {
+        input.value = angkaPolos.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    } else {
+        input.value = ''; // Biarkan kosong kalau dihapus semua
+    }
+}
+        // --- LOGIKA KALKULATOR ---
+let nilaiKalkulator = '';
+
+// Fungsi khusus untuk mengatur tampilan layar kalkulator
+function updateDisplayCalc() {
+    // 1. Tambahkan titik setiap 3 angka (format ribuan)
+    let tampilan = nilaiKalkulator.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    
+    // 2. Ubah simbol * dan / agar lebih cantik dilihat
+    tampilan = tampilan.replace(/\*/g, '×').replace(/\//g, '÷');
+    
+    document.getElementById('calcDisplay').value = tampilan;
+}
+
+function toggleCalculator() {
+    const modal = document.getElementById('calculatorModal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function calcInput(karakter) {
+    nilaiKalkulator += karakter;
+    updateDisplayCalc(); // Panggil fungsi tampilan
+}
+
+function calcClear() {
+    nilaiKalkulator = '';
+    document.getElementById('calcDisplay').value = '';
+}
+function calcBackspace() {
+    // Cek apakah ada angka yang bisa dihapus
+    if (nilaiKalkulator.length > 0) {
+        // Potong 1 karakter terakhir dari belakang
+        nilaiKalkulator = nilaiKalkulator.slice(0, -1);
+        
+        // Perbarui tampilan layar
+        updateDisplayCalc();
+    }
+}
+function calcHitung() {
+    try {
+        // Cek keamanan
+        if(/^[0-9+\-*/.]*$/.test(nilaiKalkulator)) {
+            let hasil = eval(nilaiKalkulator);
+            
+            // Bulatkan maksimal 2 angka di belakang koma (jika ada desimal)
+            if(hasil % 1 !== 0) { 
+                hasil = parseFloat(hasil.toFixed(2)); 
+            } 
+            
+            nilaiKalkulator = hasil.toString();
+            updateDisplayCalc(); // Perbarui tampilan dengan hasil akhir
+        }
+    } catch(e) {
+        document.getElementById('calcDisplay').value = 'Error';
+        nilaiKalkulator = '';
+    }
+}
+function gunakanHasil() {
+    calcHitung(); 
+    
+    const inputNominal = document.getElementById('nominal'); 
+
+    if (inputNominal) {
+        // 1. Tambahkan titik ribuan secara otomatis ke hasil hitungan
+        let hasilPakaiTitik = nilaiKalkulator.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        
+        // 2. Lempar angka yang SUDAH ADA TITIKNYA ke kotak input
+        inputNominal.value = hasilPakaiTitik;
+
+        // 3. Pancing event (jaga-jaga kalau kodemu butuh trigger ini)
+        inputNominal.dispatchEvent(new Event('input')); 
+        inputNominal.dispatchEvent(new Event('keyup')); 
+
+        // 4. Tutup dan bersihkan kalkulator
+        toggleCalculator(); 
+        calcClear();        
+    } else {
+        alert("Error: ID kolom input nominal tidak ditemukan di kodingan!");
+    }
+}
     </script>
+       
+    <div id="calculatorModal" class="calc-modal">
+        <div class="calc-card">
+            <div class="calc-header">
+                <h3 style="margin: 0; font-size: 1.1rem;">Kalkulator</h3>
+                <button onclick="toggleCalculator()" class="calc-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input type="text" id="calcDisplay" class="calc-display" disabled placeholder="0">
+            <div class="calc-grid">
+                <button onclick="calcInput('7')">7</button>
+                <button onclick="calcInput('8')">8</button>
+                <button onclick="calcInput('9')">9</button>
+                <button onclick="calcInput('/')" class="op">÷</button>
+    
+                <button onclick="calcInput('4')">4</button>
+                <button onclick="calcInput('5')">5</button>
+                <button onclick="calcInput('6')">6</button>
+                <button onclick="calcInput('*')" class="op">×</button>
+    
+                <button onclick="calcInput('1')">1</button>
+                <button onclick="calcInput('2')">2</button>
+                <button onclick="calcInput('3')">3</button>
+                <button onclick="calcInput('-')" class="op">-</button>
+    
+                <button onclick="calcClear()" class="clear">C</button>
+                <button onclick="calcInput('0')">0</button>
+                <button onclick="calcInput('000')" style="font-size: 1rem;">000</button>
+                <button onclick="calcInput('+')" class="op">+</button>
+    
+                <button onclick="calcBackspace()" style="grid-column: span 2; background-color: #F0A72B; color: black; border: 2px solid #000; border-radius: 8px; box-shadow: 2px 2px 0px #000; font-size: 1.2rem; font-weight: bold; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button onclick="calcHitung()" class="equal" style="grid-column: span 2;">=</button>
+    
+                <button onclick="gunakanHasil()" style="grid-column: span 4; background-color: var(--blue, #82D1E0); color: black; border: 2px solid black; padding: 12px; font-weight: bold; border-radius: 8px; box-shadow: 2px 2px 0px black; cursor: pointer; margin-top: 5px;">
+                    <i class="fa-solid fa-plus" style="margin-right: 5px;"></i> INPUT NOMINAL
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
