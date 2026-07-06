@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1112,3 +1113,339 @@
     </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>myMONEY.co- Neo-Brutalist Compact</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* PALET WARNA EKSAT */
+            --blue: #82D1E0;
+            --yellow: #F0A72B;
+            --red: #FFAEC1;
+            --white-custom: #F0F5F5;
+            --dark: #1A1A1A; 
+            
+            --bg-body: var(--white-custom);
+            --bg-app: #ffffff;
+            
+            /* STYLE SHAPE */
+            --border-width: 2px;
+            --radius-smooth: 12px;
+            --shadow-brutal: 5px 5px 0px #000000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { 
+            min-height: 100%;
+            overflow-x: hidden; 
+            font-family: 'Comfortaa', cursive, sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--dark); 
+        }
+
+        .font-mono {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+        }
+
+        .app-wrapper {
+            max-width: 480px; 
+            margin: 0 auto;   
+            background-color: var(--bg-app);
+            min-height: 100dvh; 
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            /* Padding bawah dikurangi lagi agar sangat pas layar */
+            padding: 1rem 1.2rem 80px 1.2rem; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.03);
+            border-left: var(--border-width) solid var(--dark);
+            border-right: var(--border-width) solid var(--dark);
+        }
+
+        /* HEADER FIX: Di-tengah-kan sesuai coretan gambarmu */
+        .app-header { flex-shrink: 0; margin-bottom: 0.8rem; display: flex; justify-content: center; align-items: center; border-bottom: var(--border-width) solid var(--dark); padding-bottom: 8px; position: relative; }
+        .header-text { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .app-header h1 { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.5rem; letter-spacing: -1px; text-transform: uppercase; }
+        .app-header p { font-size: 0.75rem; font-weight: 700; color: #555; }
+        /* Ikon user dipaku di sisi kanan agar tidak mengganggu posisi center teks */
+        .app-header i.fa-circle-user { position: absolute; right: 0; }
+
+        .app-section { flex: 1; display: none; flex-direction: column; }
+        .app-section.active { display: flex; animation: slideUp 0.3s ease; }
+
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .center-wrap {
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; 
+        }
+        .wrap-center { margin: auto 0; }
+
+        .balance-card {
+            background-color: var(--blue); border: var(--border-width) solid var(--dark); border-radius: var(--radius-smooth);
+            padding: 1.2rem; box-shadow: var(--shadow-brutal); position: relative;
+            display: flex; flex-direction: column; gap: 8px; width: calc(100% - 5px); margin-bottom: 2px; 
+            cursor: pointer;
+        }
+        .period-box {
+            background: var(--yellow); border: var(--border-width) solid var(--dark); border-radius: 8px;
+            padding: 8px 10px; font-size: 0.7rem; font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+        }
+        .balance-display { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+        .balance-amount { font-family: 'IBM Plex Mono', monospace; font-size: 1.6rem; font-weight: 700; letter-spacing: -1px; }
+
+        .hide-toggle { background: white; border: 2px solid var(--dark); border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 2px 2px 0px var(--dark); }
+        .history-summary { background: white; border: var(--border-width) solid var(--dark); border-radius: 10px; padding: 10px 12px; font-size: 0.8rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-shadow: 3px 3px 0px var(--dark); cursor: pointer; margin-top: 2px; }
+
+        .card { 
+            background: white; border: var(--border-width) solid var(--dark); border-radius: var(--radius-smooth); 
+            padding: 1.2rem; box-shadow: var(--shadow-brutal); width: calc(100% - 5px); margin-bottom: 2px;
+        }
+        .card-title { text-align: center; font-weight: 700; margin-bottom: 1rem; font-size: 0.95rem; border-bottom: 2px dashed var(--dark); padding-bottom: 8px; text-transform: uppercase; }
+
+        .form-group { margin-bottom: 0.75rem; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 10px; border: var(--border-width) solid var(--dark); border-radius: 10px; 
+            font-family: 'IBM Plex Mono', monospace; font-weight: 600; background: var(--white-custom); font-size: 0.85rem; outline: none; text-align: center; text-align-last: center; 
+        }
+        
+        .btn-primary { 
+            font-family: 'Comfortaa', sans-serif;
+            background: var(--dark); color: white; width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; border: var(--border-width) solid var(--dark); cursor: pointer; box-shadow: 4px 4px 0px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 1px; 
+        }
+        .btn-primary:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px rgba(0,0,0,0.3); }
+        
+        /* BOTTOM MENU FIX: Diperkecil & diturunkan sesuai coretan gambarmu */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 12px; /* Diturunkan dari 20px menjadi 12px */
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 94%; 
+            max-width: 440px; 
+            background: #ffffff; 
+            border: var(--border-width) solid var(--dark); 
+            border-radius: 12px; /* Dibuat sedikit lebih pipih */
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px 5px; /* Padding dikurangi agar lebih kecil */
+            box-shadow: var(--shadow-brutal); 
+            z-index: 1000; 
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--dark); font-size: 0.5rem; font-weight: 700; gap: 4px; flex: 1; text-align: center; } /* Ukuran font menu juga menyesuaikan */
+        .nav-item i { font-size: 1.4rem; -webkit-text-stroke: 1.5px var(--dark); text-shadow: 2px 2px 0px var(--dark); } /* Ukuran ikon diperkecil */
+        .icon-yellow { color: var(--yellow); } .icon-blue { color: var(--blue); } .icon-red { color: var(--red); }  
+        .nav-item.active { background: transparent; }
+        .nav-item.active i, .nav-item:active i { transform: translate(2px, 2px); text-shadow: 0px 0px 0px var(--dark); }
+
+        .table-container { background: white; border: var(--border-width) solid var(--dark); border-radius: 10px; overflow-x: hidden; flex: 1; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { position: sticky; top: 0; background: #eee; padding: 10px 5px; border-bottom: var(--border-width) solid var(--dark); font-size: 0.75rem; text-transform: uppercase; z-index: 10; font-family: 'Comfortaa', sans-serif; }
+        td { padding: 10px 8px; border-bottom: 1.5px solid #ddd; font-size: 0.8rem; font-weight: 600; word-wrap: break-word; vertical-align: middle; font-family: 'Comfortaa', sans-serif; }
+        td:nth-child(2) { font-family: 'IBM Plex Mono', monospace; text-align: right; }
+        
+        th:nth-child(1), td:nth-child(1) { width: 45%; text-align: left; padding-left: 10px; }
+        th:nth-child(2), td:nth-child(2) { width: 40%; }
+        th:nth-child(3), td:nth-child(3) { width: 15%; text-align: center; }
+
+        #tampilanBudget { font-family: 'Comfortaa', sans-serif; }
+        #tampilanBudget span:nth-child(even) { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+        #tampilanBudget .amount-big { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+
+        .hidden-amount { filter: blur(6px); user-select: none; opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+
+        <header class="app-header">
+            <div class="header-text">
+                <h3>myMONEY</h3>
+                <p>Hello, Sien!</p>
+            </div>
+            <i class="fa-solid fa-circle-user" style="font-size: 2.2rem; color: var(--yellow); -webkit-text-stroke: 1.5px var(--dark);"></i>
+        </header>
+
+        <div id="section-input" class="app-section active">
+            <div class="center-wrap">
+                <div class="balance-card" onclick="bukaRiwayatDenganShortcut('hari-ini')">
+                    <div class="period-box">
+                        <div id="period-info">(Periode anggaran - selesai)</div>
+                        <div id="total-modal-info">Total seluruh anggaran: Rp 0</div>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.75rem; font-weight: 700;">Sisa total seluruh anggaran:</p>
+                        <div class="balance-display">
+                            <span id="total-balance" class="balance-amount">Rp 0</span>
+                            <button onclick="event.stopPropagation(); toggleBalance()" class="hide-toggle"><i id="eye-icon" class="fa-solid fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="history-summary">
+                        <span>Riwayat transaksi per hari</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 0;">
+                    <h2 class="card-title">Catat Pengeluaran</h2>
+                    <form id="formTransaksi">
+                        <div class="form-group"><input type="number" id="amount" placeholder="Nominal (Rp)" required></div>
+                        <div class="form-group" style="display: flex; gap: 10px;">
+                            <input type="date" id="tanggal" required style="flex: 1;">
+                            <button type="button" id="btnHariIni" style="background: var(--red); border: var(--border-width) solid var(--dark); border-radius: 10px; font-weight: 700; padding: 0 15px; box-shadow: 2px 2px 0px var(--dark);" onclick="setHariIni()">Hari Ini</button>
+                        </div>
+                        <div class="form-group">
+                            <select id="kategori" required><option value="">Pilih Kategori</option></select>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="catatan" placeholder="Keterangan tambahan (Opsional)" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <input type="checkbox" id="rutin" style="width: 16px; height: 16px;"> Transaksi Rutin
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-primary" style="background: var(--yellow); color: var(--dark);">SIMPAN DATA</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-setting" class="app-section">
+            <div class="center-wrap wrap-center">
+                <div class="card" style="margin-bottom: 0;">
+                    <h2 class="card-title">Set Anggaran Baru</h2>
+                    <form id="formBudget" style="margin-bottom: 1.5rem;">
+                        <div class="form-group"><input type="number" id="budgetAmount" placeholder="Nominal Budget (Rp)" required></div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                            <input type="date" id="startDate" required><input type="date" id="endDate" required>
+                        </div>
+                        <div class="form-group"><select id="budgetKategori" required><option value="">Pilih Kategori</option></select></div>
+                        <button type="submit" class="btn-primary" style="background: var(--blue); color: var(--dark);">Simpan Budget</button>
+                    </form>
+                    
+                    <h2 class="card-title">Kategori</h2>
+                    <form id="formTambahKategori" style="margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="namaKategoriBaru" placeholder="Nama Kategori Baru" required>
+                            <button type="submit" class="btn-primary" style="width: 50px; margin: 0; padding: 0; border-radius: 10px;">+</button>
+                        </div>
+                    </form>
+                    <form id="formHapusKategori">
+                        <div style="display: flex; gap: 10px;">
+                            <select id="hapusKategoriPilihan" required><option value="">Pilih Kategori</option></select>
+                            <button type="button" id="btnHapusKategori" class="btn-primary" style="width: 50px; margin: 0; padding: 0; border-radius: 10px; background: var(--red);"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-beranda" class="app-section">
+            <div class="center-wrap wrap-center">
+                <div class="card" style="margin-bottom: 0;">
+                    <h2 class="card-title">Cek Laporan Budget</h2>
+                    <div class="form-group">
+                        <select id="laporanKategori" onchange="hitungSisaBudget()"><option value="">-- Pilih Kategori --</option></select>
+                    </div>
+                    <div id="tampilanBudget" style="font-size: 0.9rem; font-weight: 700; background: var(--white-custom); padding: 15px; border-radius: 10px; border: 2px dashed var(--dark);">
+                        <p style="text-align: center; color: #888;">Pilih kategori di atas untuk melihat detail.</p>
+                    </div>
+                    <button onclick="downloadPDF()" class="btn-primary" style="background: var(--blue); color: var(--dark); margin-top: 15px;">
+                        <i class="fa-solid fa-file-pdf"></i> Unduh PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-riwayat" class="app-section">
+            <div class="card">
+                <h2 id="judulRiwayat" class="card-title">Riwayat Transaksi</h2>
+                
+                <div style="display: flex; gap: 5px; margin-bottom: 6px; width: 100%;">
+                    <input type="date" id="filterTanggalMulai" style="flex: 1;" onchange="muatRiwayatTransaksi()">
+                    <input type="date" id="filterTanggalAkhir" style="flex: 1;" onchange="muatRiwayatTransaksi()">
+                </div>
+
+                <div style="display: flex; gap: 5px; margin-bottom: 12px; width: 100%;">
+                    <button type="button" onclick="setPresetPeriodeTanggal('aktif')" class="font-mono" style="flex: 1; background: var(--blue); color: var(--dark); border: var(--border-width) solid var(--dark); border-radius: 10px; font-size: 0.7rem; padding: 8px 0; box-shadow: 2px 2px 0px var(--dark); cursor: pointer;">Periode Aktif</button>
+                    <button type="button" onclick="setPresetPeriodeTanggal('sebelumnya')" class="font-mono" style="flex: 1; background: var(--yellow); color: var(--dark); border: var(--border-width) solid var(--dark); border-radius: 10px; font-size: 0.7rem; padding: 8px 0; box-shadow: 2px 2px 0px var(--dark); cursor: pointer;">Periode Lalu</button>
+                </div>
+                
+                <div class="table-container" style="margin-bottom: 0;">
+                    <table>
+                        <thead>
+                            <tr><th>Kat/Catatan</th><th>Nominal</th><th>Aksi</th></tr>
+                        </thead>
+                        <tbody id="tabelTransaksi"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-hapus" class="app-section">
+            <div class="center-wrap">
+                <div class="card" style="margin-bottom: 0;">
+                    <h2 class="card-title" style="color: var(--dark); border-bottom-color: var(--red);">Zona Berbahaya</h2>
+                    <p style="text-align: center; font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; color: #555;">Hapus transaksi secara masal.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; width: 100%;">
+                        <div>
+                            <label style="font-size: 0.7rem; font-weight: 700; opacity: 0.7; margin-bottom: 5px; display: block; text-align: left;">Dari Tanggal:</label>
+                            <input type="date" id="hapusMasalMulai" required>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.7rem; font-weight: 700; opacity: 0.7; margin-bottom: 5px; display: block; text-align: left;">Sampai Tanggal:</label>
+                            <input type="date" id="hapusMasalAkhir" required>
+                        </div>
+                    </div>
+                    
+                    <button onclick="eksekusiHapusMasal()" class="btn-primary" style="background: var(--red); color: var(--dark);">
+                        <i class="fa-solid fa-skull"></i> BERSIHKAN DATA
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+
+    <nav class="bottom-nav">
+        <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
+            <i class="fa-solid fa-house icon-yellow"></i><span>Beranda</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('setting', this)">
+            <i class="fa-solid fa-plus icon-blue"></i><span>Anggaran</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('beranda', this)">
+            <i class="fa-solid fa-chart-pie icon-red"></i><span>Laporan</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="bukaRiwayatDenganShortcut('aktif', this)">
+            <i class="fa-solid fa-clock icon-blue"></i><span>Riwayat</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hapus', this)">
+            <i class="fa-solid fa-ban icon-yellow"></i><span>Hapus</span>
+        </a>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>
+>>>>>>> 9c647b69bfeec29ebe7db3d1fd91c0c2161c3456
